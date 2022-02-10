@@ -4,14 +4,54 @@ executors:
       - image: 'cimg/openjdk:11.0.5'
 orbs:
   maven: circleci/maven@1.3.0
+  aws-ecr: circleci/aws-ecr@6.15.3
 version: 2.1
+jobs:
+  release-presto-gateway:
+    docker:
+      - image: cimg/base:2021.05
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - aws-ecr/ecr-login:
+          account-url: PROD_ECR_ACCOUNT_URL
+      - aws-ecr/ecr-login:
+          account-url: DEV_ECR_ACCOUNT_URL
+      - run:
+          name: Build Docker Image and Push to ECR
+          command: |
+            IMAGE_NAME=presto-gateway
+            REGISTRY=711570343235.dkr.ecr.us-west-2.amazonaws.com
+
+            if [[ -n "${CIRCLE_TAG}" ]]; then
+              TAG="${CIRCLE_TAG}"
+            else
+              TAG="${CIRCLE_BRANCH}"
+            fi
+
+            # Build docker image and tag
+            docker build -t "${IMAGE_NAME}:latest" --build-arg GEMFURY_API_KEY="${GEMFURY_API_KEY}" .
+            docker tag "${IMAGE_NAME}:latest" "${REGISTRY}/${IMAGE_NAME}:${TAG}"
+            docker push "${REGISTRY}/${IMAGE_NAME}:${TAG}"
 workflows:
-  maven_test:
+  versin: 2
+  presto_gateway_build_and_release:
     jobs:
       - maven/test:
-          command: '-X install'
           executor: openjdk_11
           filters:
             branches:
               only:
                 - patch/prometheus-metrics
+      - release-images:
+          context: Deploy
+          requires:
+            - maven/test
+          filters:
+            branches:
+              only:
+                - patch/prometheus-metrics
+            tags:
+              only:
+                - /^\d+\.\d+\.\d+$/
