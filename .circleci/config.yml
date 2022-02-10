@@ -2,6 +2,10 @@ executors:
   openjdk_11:
     docker:
       - image: 'cimg/openjdk:11.0.5'
+parameters:
+  aws-region:
+    type: string
+    default: "us-west-2"
 orbs:
   maven: circleci/maven@1.3.0
   aws-ecr: circleci/aws-ecr@6.15.3
@@ -10,6 +14,8 @@ jobs:
   release-presto-gateway:
     docker:
       - image: cimg/base:2021.05
+    environment:
+      AWS_REGION: "<< pipeline.parameters.aws-region >>"
     steps:
       - checkout
       - setup_remote_docker:
