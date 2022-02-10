@@ -9,6 +9,7 @@ workflows:
   maven_test:
     jobs:
       - maven/test:
+          command: '-X install'
           executor: openjdk_11
           filters:
             branches:
