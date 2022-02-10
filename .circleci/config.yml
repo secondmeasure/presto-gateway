@@ -44,7 +44,7 @@ workflows:
             branches:
               only:
                 - patch/prometheus-metrics
-      - release-images:
+      - release-presto-gateway:
           context: Deploy
           requires:
             - maven/test
