@@ -35,7 +35,7 @@ jobs:
             docker tag "${IMAGE_NAME}:latest" "${REGISTRY}/${IMAGE_NAME}:${TAG}"
             docker push "${REGISTRY}/${IMAGE_NAME}:${TAG}"
 workflows:
-  versin: 2
+  version: 2
   presto_gateway_build_and_release:
     jobs:
       - maven/test:
