@@ -22,8 +22,6 @@ jobs:
           docker_layer_caching: true
       - aws-ecr/ecr-login:
           account-url: PROD_ECR_ACCOUNT_URL
-#      - aws-ecr/ecr-login:
-#          account-url: DEV_ECR_ACCOUNT_URL
       - run:
           name: Build Docker Image and Push to ECR
           command: |
@@ -47,9 +45,9 @@ workflows:
       - maven/test:
           executor: openjdk_11
           filters:
-            branches:
+            tags:
               only:
-                - patch/prometheus-metrics
+                - /^\d+\.\d+\.\d+$/
       - release-presto-gateway:
           context: Deploy
           requires:
@@ -57,7 +55,8 @@ workflows:
           filters:
             branches:
               only:
-                - patch/prometheus-metrics
+                - master
+                - /feature-.*/
             tags:
               only:
                 - /^\d+\.\d+\.\d+$/

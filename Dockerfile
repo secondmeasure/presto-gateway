@@ -17,6 +17,7 @@ RUN groupadd ${GROUP} --gid ${GID} \
 
 ARG USER_HOME_DIR="/root"
 
+# Download maven and install and correct location
 ARG BASE_URL=https://dlcdn.apache.org/maven/maven-3/${MAVEN_VERSION}/binaries
 
 RUN mkdir -p /usr/share/maven /usr/share/maven/ref \
@@ -30,10 +31,12 @@ RUN mkdir -p /usr/share/maven /usr/share/maven/ref \
 ENV MAVEN_HOME /usr/share/maven
 ENV MAVEN_CONFIG "$USER_HOME_DIR/.m2"
 
+# Build project
 WORKDIR /app
 COPY . .
 RUN mvn clean install
 
+# Copy jar and conf to suitable location
 RUN cp gateway-ha/target/gateway-ha-1.8.8.1-SNAPSHOT-jar-with-dependencies.jar /usr/lib/presto-gateway/bin/gateway-ha-1.8.8.1-SNAPSHOT-jar-with-dependencies.jar
 RUN chmod +x /usr/lib/presto-gateway/bin/gateway-ha-1.8.8.1-SNAPSHOT-jar-with-dependencies.jar
 COPY gateway-ha/gateway-ha-config.yml /usr/lib/presto-gateway/conf/gateway-ha-config.yml
