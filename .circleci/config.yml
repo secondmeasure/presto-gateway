@@ -21,9 +21,9 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
       - aws-ecr/ecr-login:
-          account-url: 711570343235.dkr.ecr.us-west-2.amazonaws.com
-      - aws-ecr/ecr-login:
-          account-url: 711570343235.dkr.ecr.us-west-2.amazonaws.com
+          account-url: PROD_ECR_ACCOUNT_URL
+#      - aws-ecr/ecr-login:
+#          account-url: DEV_ECR_ACCOUNT_URL
       - run:
           name: Build Docker Image and Push to ECR
           command: |
