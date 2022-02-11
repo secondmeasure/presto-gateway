@@ -1,0 +1,14 @@
+FROM 711570343235.dkr.ecr.us-west-2.amazonaws.com/presto-gateway/gateway-ha:1.8.8 as gateway
+FROM gateway
+WORKDIR /opt/app/
+ENV APP_VERSION 1.8.8
+USER root
+COPY --from=gateway /usr/lib/presto-gateway/bin/gateway-ha-${APP_VERSION}-SNAPSHOT-jar-with-dependencies.jar gateway-ha-${APP_VERSION}-SNAPSHOT-jar-with-dependencies.jar
+COPY conf/gateway-ha-config.yml gateway-ha-config.yml
+COPY ./entrypoint.sh /opt/app/entrypoint.sh
+COPY resources/gateway-ha-persistence.sql /opt/app/gateway-ha-persistence.sql
+RUN chmod +x /opt/app/entrypoint.sh
+
+EXPOSE 8080
+RUN apt-get update && apt-get -y install build-essential && apt-get -y install default-mysql-client
+ENTRYPOINT ["/opt/app/entrypoint.sh"]

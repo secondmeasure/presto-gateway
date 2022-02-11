@@ -45,9 +45,9 @@ COPY . .
 RUN mvn clean install
 
 # Copy jar and conf to suitable location
-RUN cp gateway-ha/target/gateway-ha-${VERSION}-SNAPSHOT-jar-with-dependencies.jar /usr/lib/presto-gateway/bin/gateway-ha-{VERSION}-SNAPSHOT-jar-with-dependencies.jar
-RUN chmod +x /usr/lib/presto-gateway/bin/gateway-ha-{VERSION}-SNAPSHOT-jar-with-dependencies.jar
+RUN cp gateway-ha/target/gateway-ha-${VERSION}-SNAPSHOT-jar-with-dependencies.jar /usr/lib/presto-gateway/bin/gateway-ha-${VERSION}-SNAPSHOT-jar-with-dependencies.jar
+RUN chmod +x /usr/lib/presto-gateway/bin/gateway-ha-${VERSION}-SNAPSHOT-jar-with-dependencies.jar
 COPY gateway-ha/gateway-ha-config.yml /usr/lib/presto-gateway/conf/gateway-ha-config.yml
 
 USER 1501:1501
-CMD java -jar /usr/lib/presto-gateway/bin/gateway-ha-{VERSION}-SNAPSHOT-jar-with-dependencies.jar server /usr/lib/presto-gateway/conf/gateway-ha-config.yml
+CMD java -jar /usr/lib/presto-gateway/bin/gateway-ha-${VERSION}-SNAPSHOT-jar-with-dependencies.jar server /usr/lib/presto-gateway/conf/gateway-ha-config.yml
