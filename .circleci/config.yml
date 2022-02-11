@@ -38,7 +38,7 @@ jobs:
             docker build -t "${IMAGE_NAME}:latest" .
 
             COMMIT=$(git rev-parse --short HEAD 2>/dev/null)
-            VERSION$(docker inspect --format='{{ .Config.Labels.version }}' ${IMAGE_NAME}:latest | tr -d '[:space:]')
+            VERSION=$(docker inspect --format='{{ .Config.Labels.version }}' ${IMAGE_NAME}:latest | tr -d '[:space:]')
             NAMESPACE=$(docker inspect --format='{{ .Config.Labels.namespace }}' ${IMAGE_NAME}:latest | tr -d '[:space:]')
             IMAGE_NAME=$(docker inspect --format='{{ .Config.Labels.name }}' ${IMAGE_NAME}:latest | tr -d '[:space:]')
 
