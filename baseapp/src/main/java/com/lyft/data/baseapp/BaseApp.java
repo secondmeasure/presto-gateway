@@ -15,9 +15,6 @@ import io.dropwizard.lifecycle.setup.LifecycleEnvironment;
 import io.dropwizard.servlets.tasks.Task;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.dropwizard.DropwizardExports;
-import io.prometheus.client.exporter.MetricsServlet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -123,15 +120,6 @@ public abstract class BaseApp<T extends AppConfiguration> extends Application<T>
 
   private Injector configureGuice(T configuration, Environment environment) throws Exception {
     appModules.add(new MetricRegistryModule(environment.metrics()));
-
-    /**
-    CollectorRegistry collectorRegistry = new CollectorRegistry();
-    collectorRegistry.register(new DropwizardExports(environment.metrics()));
-    environment.admin()
-            .addServlet("prometheusMetrics", new MetricsServlet(collectorRegistry))
-            .addMapping("/prometheusMetrics");
-     */
-
     appModules.addAll(addModules(configuration, environment));
     Injector injector = Guice.createInjector(ImmutableList.copyOf(appModules));
     injector.injectMembers(this);
