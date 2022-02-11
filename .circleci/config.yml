@@ -25,8 +25,8 @@ jobs:
       - run:
           name: Build Docker Image and Push to ECR
           command: |
-            IMAGE_NAME=presto-gateway
             REGISTRY=711570343235.dkr.ecr.us-west-2.amazonaws.com
+            IMAGE_NAME=gateway-ha
 
             if [[ -n "${CIRCLE_TAG}" ]]; then
               TAG="${CIRCLE_TAG}"
@@ -35,9 +35,21 @@ jobs:
             fi
 
             # Build docker image and tag
-            docker build -t "${IMAGE_NAME}:latest" --build-arg GEMFURY_API_KEY="${GEMFURY_API_KEY}" .
-            docker tag "${IMAGE_NAME}:latest" "${REGISTRY}/${IMAGE_NAME}:${TAG}"
-            docker push "${REGISTRY}/${IMAGE_NAME}:${TAG}"
+            docker build -t "${IMAGE_NAME}:latest" .
+
+            COMMIT=$(git rev-parse --short HEAD 2>/dev/null)
+            VERSION$(docker inspect --format='{{ .Config.Labels.version }}' ${IMAGE_NAME}:latest | tr -d '[:space:]')
+            NAMESPACE=$(docker inspect --format='{{ .Config.Labels.namespace }}' ${IMAGE_NAME}:latest | tr -d '[:space:]')
+            IMAGE_NAME=$(docker inspect --format='{{ .Config.Labels.name }}' ${IMAGE_NAME}:latest | tr -d '[:space:]')
+
+            docker tag "${IMAGE_NAME}:latest" "${REGISTRY}/${NAMESPACE}/${IMAGE_NAME}:${TAG}"
+            docker tag "${IMAGE_NAME}:latest" "${REGISTRY}/${NAMESPACE}/${IMAGE_NAME}:${VERSION}"
+            docker tag "${IMAGE_NAME}:latest" "${REGISTRY}/${NAMESPACE}/${IMAGE_NAME}:${VERSION}-${COMMIT}"
+            docker tag "${IMAGE_NAME}:latest" "${REGISTRY}/${NAMESPACE}/${IMAGE_NAME}:${COMMIT}"
+            docker push "${REGISTRY}/${NAMESPACE}/${IMAGE_NAME}:${TAG}"
+            docker push "${REGISTRY}/${NAMESPACE}/${IMAGE_NAME}:${VERSION}"
+            docker push "${REGISTRY}/${NAMESPACE}/${IMAGE_NAME}:${VERSION}-${COMMIT}"
+            docker push "${REGISTRY}/${NAMESPACE}/${IMAGE_NAME}:${COMMIT}"
 workflows:
   version: 2
   presto_gateway_build_and_release:

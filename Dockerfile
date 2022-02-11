@@ -1,5 +1,13 @@
 FROM openjdk:11.0.2-jre-slim
 
+ARG NAME=gateway-ha
+ARG NAMESPACE=presto-gateway
+ARG VERSION=1.8.8
+
+LABEL name="${NAME}" \
+        namespace="${NAMESPACE}" \
+        version="${VERSION}"
+
 RUN apt-get update && apt-get install -y curl
 
 ARG USER=presto-gateway
@@ -37,9 +45,9 @@ COPY . .
 RUN mvn clean install
 
 # Copy jar and conf to suitable location
-RUN cp gateway-ha/target/gateway-ha-1.8.8.1-SNAPSHOT-jar-with-dependencies.jar /usr/lib/presto-gateway/bin/gateway-ha-1.8.8.1-SNAPSHOT-jar-with-dependencies.jar
-RUN chmod +x /usr/lib/presto-gateway/bin/gateway-ha-1.8.8.1-SNAPSHOT-jar-with-dependencies.jar
+RUN cp gateway-ha/target/gateway-ha-${VERSION}-SNAPSHOT-jar-with-dependencies.jar /usr/lib/presto-gateway/bin/gateway-ha-{VERSION}-SNAPSHOT-jar-with-dependencies.jar
+RUN chmod +x /usr/lib/presto-gateway/bin/gateway-ha-{VERSION}-SNAPSHOT-jar-with-dependencies.jar
 COPY gateway-ha/gateway-ha-config.yml /usr/lib/presto-gateway/conf/gateway-ha-config.yml
 
 USER 1501:1501
-CMD java -jar /usr/lib/presto-gateway/bin/gateway-ha-1.8.8.1-SNAPSHOT-jar-with-dependencies.jar server /usr/lib/presto-gateway/conf/gateway-ha-config.yml
+CMD java -jar /usr/lib/presto-gateway/bin/gateway-ha-{VERSION}-SNAPSHOT-jar-with-dependencies.jar server /usr/lib/presto-gateway/conf/gateway-ha-config.yml
