@@ -1,0 +1,41 @@
+version: '3'
+services:
+  presto_gateway:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.dev
+    container_name: presto_gateway
+    volumes:
+      - .:/app
+    environment:
+      APP_MODE: dev
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASS: root123
+      ADMIN_PORT: 8091
+      APP_PORT: 8090
+    entrypoint: /opt/app/entrypoint.sh
+    expose:
+      - "8091"
+      - "8090"
+    ports:
+      - 28090:8090
+      - 28091:8091
+    networks:
+      - default
+    links:
+      - mysql
+  mysql:
+    restart: unless-stopped
+    image: mysql:5.7
+    container_name: presto_gateway_mysql
+    ports:
+    - 33306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: prestogateway
+    volumes:
+    - ./dockerconf/mysqlconf:/etc/mysql/conf.d
+    networks:
+      - default
