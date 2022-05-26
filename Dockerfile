@@ -2,7 +2,7 @@ FROM openjdk:11.0.2-jre-slim
 
 ARG NAME=gateway-ha
 ARG NAMESPACE=presto-gateway
-ARG VERSION=1.8.8
+ARG VERSION=1.9.0
 
 LABEL name="${NAME}" \
         namespace="${NAMESPACE}" \
