@@ -82,41 +82,4 @@ public class TestRoutingGroupSelector {
         routingGroupSelector.findRoutingGroup(mockRequest), null);
   }
 
-  public void testByRoutingRulesEngineFileChange() throws Exception {
-    File file = File.createTempFile("routing_rules", ".yml");
-
-    FileWriter fw = new FileWriter(file);
-    fw.write(
-        "---\n"
-        + "name: \"airflow\"\n"
-        + "description: \"if query from airflow, route to etl group\"\n"
-        + "condition: \"request.getHeader(\\\"X-Trino-Source\\\") == \\\"airflow\\\"\"\n"
-        + "actions:\n"
-        + "  - \"result.put(\\\"routingGroup\\\", \\\"etl\\\")\"");
-    fw.close();
-
-    RoutingGroupSelector routingGroupSelector =
-        RoutingGroupSelector.byRoutingRulesEngine(file.getPath());
-
-    HttpServletRequest mockRequest = mock(HttpServletRequest.class);
-
-    when(mockRequest.getHeader(TRINO_SOURCE_HEADER)).thenReturn("airflow");
-    Assert.assertEquals(
-        routingGroupSelector.findRoutingGroup(mockRequest), "etl");
-
-    fw = new FileWriter(file);
-    fw.write(
-        "---\n"
-        + "name: \"airflow\"\n"
-        + "description: \"if query from airflow, route to etl group\"\n"
-        + "condition: \"request.getHeader(\\\"X-Trino-Source\\\") == \\\"airflow\\\"\"\n"
-        + "actions:\n"
-        + "  - \"result.put(\\\"routingGroup\\\", \\\"etl2\\\")\""); // change from etl to etl2
-    fw.close();
-
-    when(mockRequest.getHeader(TRINO_SOURCE_HEADER)).thenReturn("airflow");
-    Assert.assertEquals(
-        routingGroupSelector.findRoutingGroup(mockRequest), "etl2");
-    file.deleteOnExit();
-  }
 }
